@@ -1,0 +1,12 @@
+{
+  "name": "momoi-labs-skills",
+  "description": "Personal agent skills from Momoi Labs.",
+  "version": "0.1.0",
+  "skills": [
+    "./skills/my-commit",
+    "./skills/my-handoff",
+    "./skills/my-implement",
+    "./skills/my-pg-researcher",
+    "./skills/my-to-tickets"
+  ]
+}
