@@ -1,0 +1,6 @@
+interface:
+  display_name: "My To Tickets"
+  short_description: "Publish epic sub-issues and agent handoffs"
+  default_prompt: "Use $my-to-tickets to split this GitHub epic into ordered sub-issues and paste-ready implementation prompts."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,6 @@
+interface:
+  display_name: "My Commit"
+  short_description: "Create commits with personal conventions"
+  default_prompt: "Use $my-commit to commit the staged changes."
+policy:
+  allow_implicit_invocation: false

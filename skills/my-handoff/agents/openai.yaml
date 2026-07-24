@@ -1,0 +1,6 @@
+interface:
+  display_name: "My Handoff"
+  short_description: "Handoff with a paste-ready next-agent prompt"
+  default_prompt: "Use $my-handoff to write a dated handoff and return a paste-ready prompt for the next agent."
+policy:
+  allow_implicit_invocation: false
