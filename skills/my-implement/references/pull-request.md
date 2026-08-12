@@ -12,7 +12,7 @@ Check tracked files in this priority order:
 3. `docs/pull_request_template.md`
 4. Files under `.github/PULL_REQUEST_TEMPLATE/`
 
-Use `git ls-files` from the leased worktree so untracked or unrelated templates
+Use `git ls-files` from the isolated worktree so untracked or unrelated templates
 cannot be selected accidentally.
 
 If one of the first three templates exists, use the first match. Otherwise, if

@@ -95,7 +95,7 @@ These wrap Matt Pocock's original skills with personal conventions (path naming,
 | ------------------ | ------------ | ---------------------------------------------------------------------------------------------- |
 | `my-handoff`       | `handoff`    | Dated docs, OS temp path, slug naming, paste-ready prompt                                      |
 | `my-to-tickets`    | `to-tickets` | GitHub native `--parent` / `--blocked-by`, reconciliation, shared handoff, unlock waves        |
-| `my-implement`     | `implement`  | Treehouse worktree lease, `seba/` branches, local validation loop, `my-commit`, PR publication |
+| `my-implement`     | `implement`  | Native Git worktree, `seba/` branches, local validation loop, `my-commit`, PR publication       |
 | `my-commit`        | (none)       | Personal commit gate — inspect, stage explicitly, validate                                     |
 | `my-pg-researcher` | (none)       | PostgreSQL source code and mailing list researcher                                             |
 

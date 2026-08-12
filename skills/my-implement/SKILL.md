@@ -1,6 +1,6 @@
 ---
 name: my-implement
-description: Implement work from either a GitHub issue or an already-resolved brainstorm, grill, or implementation plan through the user's personal workflow around the externally maintained implement skill. Use when work should run in a leased Treehouse worktree, use seba-prefixed branches and my-commit, wait for local user validation, publish a ready pull request without requiring an issue, wait for that PR to merge, and return the Treehouse worktree.
+description: Implement work from either a GitHub issue or an already-resolved brainstorm, grill, or implementation plan through the user's personal workflow around the externally maintained implement skill. Use when work should run in an isolated native Git worktree, use seba-prefixed branches and my-commit, wait for local user validation, publish a ready pull request without requiring an issue, wait for that PR to merge, and remove the worktree.
 ---
 
 # My Implement
@@ -49,7 +49,7 @@ Fetch `origin` before resolving the base:
 Record the exact base commit before creating the task branch. Use that immutable
 commit later when compacting task commits.
 
-## 2. Lease the worktree and create the branch
+## 2. Create the isolated worktree and branch
 
 Derive a lowercase kebab-case feature slug from the resolved work title and
 prefix it with `seba/`. For example, `Add Recurring Expenses` becomes
@@ -59,28 +59,47 @@ Check local branches, remote branches, and existing worktrees for a collision.
 If the name is already in use, stop and ask whether to reuse it or choose another
 name. Never overwrite or reset a branch merely to resolve the collision.
 
-If the user chooses reuse, continue only when `treehouse status` identifies the
-existing worktree as durably leased, the local branch is unpushed and
-unpublished, the worktree is clean, and the branch descends from the recorded
-base. Show its commits and changed paths, then require the user to confirm that
-they all belong to this work. Continue directly in that existing leased
-worktree; do not acquire another worktree or recreate/switch the branch. A remote
-branch, published branch, non-leased or dirty worktree, or unverifiable history
+Identify the canonical main checkout from `git worktree list --porcelain`: it is
+the worktree whose path contains the repository's `.git` directory rather than a
+`.git` file. Record its absolute path as `<main-checkout-path>`. Derive every
+task worktree from that checkout, even when the skill starts inside another
+worktree, using this deterministic sibling path:
+
+```text
+<parent-of-repository>/<repository-name>-worktrees/<branch-name>
+```
+
+For example, the `seba/add-recurring-expenses` branch for
+`/projects/budget` uses
+`/projects/budget-worktrees/seba/add-recurring-expenses`. Record the resulting
+absolute path and the main checkout path. Run every `git worktree` command below
+with `git -C <main-checkout-path>`.
+
+If the user chooses reuse, continue only when `git worktree list --porcelain`
+identifies the existing registered worktree for that branch, the local branch is
+unpushed and unpublished, the worktree is clean, and the branch descends from the
+recorded base. Show its commits and changed paths, then require the user to
+confirm that they all belong to this work. Continue directly in that worktree; do
+not create another worktree or recreate/switch the branch. A remote branch,
+published branch, unregistered or dirty worktree, or unverifiable history
 requires a different branch name and stays outside this new-work workflow.
 
-For a new branch name, acquire a durable worktree from the verified repository
-with `treehouse get --lease`, recording the returned absolute path. Confirm that
-the leased worktree is clean, then create the task branch there from the resolved
-base commit. Perform every subsequent operation inside the selected worktree.
+For a new branch name, create the parent directory and add a native Git
+worktree at the deterministic path from the resolved base commit:
 
-Keep the worktree leased through implementation, validation, publication, and any
-post-publication fixes. Do not return it early unless the user explicitly asks to
-abandon the lease. After the pull request merges, return it as required in
-section 6.
+```bash
+mkdir -p "$(dirname <absolute-worktree-path>)"
+git -C <main-checkout-path> worktree add -b <branch-name> <absolute-worktree-path> <base-commit>
+```
+
+Confirm that the new worktree is clean, then perform every subsequent operation
+inside it. Keep it through implementation, validation, publication, and any
+post-publication fixes. Do not remove it early unless the user explicitly asks to
+abandon it. After the pull request merges, remove it as required in section 6.
 
 ## 3. Implement and commit
 
-Follow the original `implement` skill in the leased worktree, including its TDD,
+Follow the original `implement` skill in the isolated worktree, including its TDD,
 testing, typechecking, and code-review requirements. Pass it the resolved work
 source as its spec: the issue for issue-backed work or the approved conversation
 and plan for conversation-backed work.
@@ -182,11 +201,11 @@ reference.
 
 Push the branch with upstream tracking and create a ready-for-review pull request
 against the chosen base. Report the pull request URL, branch, final commit, and
-leased worktree path, then continue to section 6. Do not end the workflow here.
+isolated worktree path, then continue to section 6. Do not end the workflow here.
 
-## 6. Wait for merge and return the worktree
+## 6. Wait for merge and remove the worktree
 
-After the pull request exists, keep the lease until that exact PR is merged.
+After the pull request exists, keep the worktree until that exact PR is merged.
 Do not treat the first `OPEN` observation as the end of the workflow. Poll until
 `state` is `MERGED`:
 
@@ -197,26 +216,32 @@ gh pr view <number> --repo <owner/name> --json state,mergedAt,url
 Repeat that check on a short interval while the PR stays `OPEN`. Between polls,
 post-publication fixes from the Published branches rules below remain allowed;
 after any such fix, resume polling the same PR until it merges. If the user
-reports that the PR merged, verify with `gh` before returning.
+reports that the PR merged, verify with `gh` before removing the worktree.
 
 When `state` is `MERGED`:
 
-1. Leave or avoid depending on a shell whose cwd is inside the leased worktree.
-2. Return the recorded absolute path non-interactively:
+1. Leave or avoid depending on a shell whose cwd is inside the isolated worktree.
+2. Confirm its working tree is clean. If it is not, stop and ask the user whether
+   to discard the changes and remove it or keep it for follow-up work.
+3. Remove the clean recorded worktree from the recorded main checkout:
 
 ```bash
-treehouse return --force <leased-worktree-path>
+git -C <main-checkout-path> worktree remove <absolute-worktree-path>
 ```
 
-3. Confirm with `treehouse status` that the path is no longer leased.
-4. Report the PR URL and that the worktree was returned. The workflow ends here.
+4. Confirm with `git -C <main-checkout-path> worktree list --porcelain` that the
+   path is no longer registered.
+5. Report the PR URL and that the worktree was removed. The workflow ends here.
 
-If the PR is `CLOSED` without merge, do not return automatically. Ask whether to
-keep the lease for follow-up work or return the worktree. Return only after an
-explicit choice to release it, using the same `treehouse return --force` command.
+If the PR is `CLOSED` without merge, do not remove automatically. Ask whether to
+keep the worktree for follow-up work or remove it. Remove only after an explicit
+choice. Before removing it, confirm it is clean; if the user explicitly chooses
+to discard uncommitted changes, use
+`git -C <main-checkout-path> worktree remove --force <absolute-worktree-path>`.
 
-Never leave a merged PR's worktree leased. Never run `treehouse return` before
-merge unless the user explicitly asks to abandon the lease.
+Remove a merged PR's clean worktree promptly. Never run `git worktree remove`
+before merge unless the user explicitly asks to abandon the worktree. Preserve a
+dirty worktree until the user explicitly chooses whether to discard or keep it.
 
 ## Published branches
 
