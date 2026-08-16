@@ -41,7 +41,7 @@ npx skills@latest add momoi-labs/skills \
 
 ## Setup
 
-Run **`/setup-matt-pocock-skills`** before your first engineering flow to configure the issue tracker, triage labels, and domain doc layout the skills assume.
+Run **`/setup-repo`** to bootstrap a repository. It orchestrates **`/setup-matt-pocock-skills`** (issue tracker, triage labels, domain docs), records **`my-commit`** as the default commit path, adds conventional-commits validation (PR title and commit messages), sets rebase-and-merge as the merge strategy, and scaffolds `docs/PRINCIPLES.md` + ADRs. Idempotent — safe to re-run.
 
 ## Main Flow: Idea → Ship
 
@@ -98,6 +98,7 @@ These wrap Matt Pocock's original skills with personal conventions (path naming,
 | `my-implement`     | `implement`  | Native Git worktree, `seba/` branches, local validation loop, `my-commit`, PR publication       |
 | `my-commit`        | (none)       | Personal commit gate — inspect, stage explicitly, validate                                     |
 | `my-pg-researcher` | (none)       | PostgreSQL source code and mailing list researcher                                             |
+| `setup-repo`        | (none)       | One-shot bootstrap: conventional-commits validation, `my-commit` as default commit, rebase-and-merge, `PRINCIPLES.md` + ADR scaffolding |
 
 ## Repository layout
 
