@@ -7,6 +7,7 @@
   },
   "repository": "https://github.com/momoi-labs/skills",
   "skills": [
+    "./skills/create-image",
     "./skills/my-commit",
     "./skills/my-handoff",
     "./skills/my-implement",
