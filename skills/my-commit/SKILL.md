@@ -15,15 +15,19 @@ When invoked, create a git commit following these steps:
 2. **Determine type**: Choose the appropriate commit type based on changes:
    - `feat`: New feature or capability
    - `fix`: Bug fix
-   - `refactor`: Code restructuring without behavior change
-   - `docs`: Documentation changes
-   - `chore`: Maintenance tasks, dependency updates
-   - `test`: Test additions or modifications
+   - `docs`: Documentation-only changes
    - `style`: Formatting, whitespace (no code change)
+   - `refactor`: Code restructuring without behavior change
+   - `perf`: Performance improvement
+   - `test`: Test additions or modifications
+   - `build`: Build system or external dependency changes
+   - `ci`: CI configuration and scripts
+   - `chore`: Maintenance tasks, dependency updates
+   - `revert`: Revert a previous commit
 
 3. **Format commit message**:
    ```
-   <type>: <subject line (max 50 characters)>
+   <type>[optional scope][!]: <subject line (max 50 characters)>
 
    <body: lines wrapped at 80 columns, focus on WHY not WHAT>
    ```
@@ -33,6 +37,8 @@ When invoked, create a git commit following these steps:
 ## Rules
 
 - **Title**: Maximum 50 characters, lowercase, no period
+- **Optional scope**: Add a `(scope)` after the type when it helps, e.g. `feat(api): ...`
+- **Breaking change**: Append `!` before the colon, e.g. `feat(api)!: ...`
 - **Body**: Lines wrapped at 80 columns maximum
 - **Sign-off required**: Always use `-s` flag
 - **Focus on problem solved**: Describe why, not implementation details

@@ -8,6 +8,7 @@
     "./skills/my-handoff",
     "./skills/my-implement",
     "./skills/my-pg-researcher",
-    "./skills/my-to-tickets"
+    "./skills/my-to-tickets",
+    "./skills/setup-repo"
   ]
 }
