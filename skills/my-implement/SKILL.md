@@ -203,7 +203,37 @@ Push the branch with upstream tracking and create a ready-for-review pull reques
 against the chosen base. Report the pull request URL, branch, final commit, and
 isolated worktree path, then continue to section 6. Do not end the workflow here.
 
+After creating the pull request, ask the user whether they want you to watch the
+CI and merge the pull request automatically once the checks pass. If they
+decline, continue to section 6 with the manual-polling path. If they accept,
+record the acceptance and follow the monitor-and-merge path in section 6.
+
 ## 6. Wait for merge and remove the worktree
+
+When the user accepted automatic merge, follow this path instead of the
+manual-polling path below. Watch the CI until it finishes:
+
+```bash
+gh pr checks <number> --repo <owner/name> --watch
+```
+
+When every check passes, merge the pull request and continue to the `MERGED`
+cleanup below:
+
+```bash
+gh pr merge <number> --repo <owner/name> --rebase
+```
+
+If the pull request is already `MERGED` (merged by someone else during the
+watch), skip the merge and go straight to the cleanup below.
+
+If the repository has no checks, report that there is no CI to watch, so
+automatic merge is not possible, and stop without merging. If any check fails,
+or `gh pr merge` fails — including a required review that blocks the merge —
+report the failure and stop without merging. Do not keep waiting and do not
+merge.
+
+When the user declined automatic merge, use the manual-polling path below.
 
 After the pull request exists, keep the worktree until that exact PR is merged.
 Do not treat the first `OPEN` observation as the end of the workflow. Poll until
