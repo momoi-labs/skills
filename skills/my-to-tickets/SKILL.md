@@ -13,16 +13,16 @@ completely. Also read [my-handoff](../my-handoff/SKILL.md) and apply its handoff
 content, path, naming, redaction, language, and collision conventions. Where
 this skill adds or overrides a convention, follow this skill.
 
-## 0. Modo de execução
+## 0. Execution mode
 
-Antes de iniciar qualquer trabalho, pergunte ao usuário se deseja o modo
-`print` (comportamento existente: apenas exibir prompts copyable) ou
-`dispatch` (disparar subagentes continuables hierárquicos além de printar
-os prompts para registro).
+Before starting any work, ask the user whether they want `print` mode
+(existing behavior: only display copyable prompts) or `dispatch` mode
+(spawn hierarchical continuable subagents in addition to printing the prompts
+for record).
 
-Registre o modo escolhido e mantenha-o durante toda a execução do skill. O
-modo afeta como o handoff é escrito (Seção 5) e como os prompts são emitidos
-(Seção 6).
+Record the chosen mode and keep it throughout the skill execution. The mode
+affects how the handoff is written (Section 5) and how prompts are emitted
+(Section 6).
 
 ## 1. Resolve the epic, repository, and base
 
@@ -193,87 +193,85 @@ When resuming, treat closed blockers as satisfied. Record closed issues in the
 handoff, but omit them from the paste-ready prompt list. Recompute unlock waves
 from the remaining open graph.
 
-No modo `dispatch`, registre também no handoff:
+In `dispatch` mode, also record in the handoff:
 
-- O modo de execução escolhido (dispatch).
-- A lista de subagentes disparados, com número do issue, label e subagent id.
-- O status de cada wave (dispatched, completed, failed).
+- The chosen execution mode (dispatch).
+- The list of dispatched subagents, with issue number, label, and subagent id.
+- The status of each wave (dispatched, completed, failed).
 
 ## 6. Emit every remaining implementation prompt
 
 Write the response in the current chat language. First report the handoff path,
 the current frontier, the complete wave order, and any safe parallelism.
 
-### Modo print
+### Print mode
 
-No modo `print`, emita um bloco fenced copyable separado para cada sub-issue
-aberto e, por último, o épico. Agrupe os blocos sob headings numerados de
-unlock-wave. Inclua todas as waves agora, mas indique que um prompt de wave
-futura não deve ser aberto até que todos os seus blockers estejam `CLOSED`.
+In `print` mode, emit one separately copyable fenced block for each open
+sub-issue and, last, the epic. Group blocks under numbered unlock-wave
+headings. Include all waves now, but state that a future-wave prompt must not
+be opened until all of its blockers are `CLOSED`.
 
-Use este formato, adaptando a frase de escopo ao ticket:
+Use this shape, adapting the scope sentence to the ticket:
 
 ```text
-Leia <absolute-handoff-path> e continue de onde a sessão parou.
+Read <absolute-handoff-path> and continue from where the session left off.
 
 ---
-Invoque $my-implement no issue <canonical-issue-url>.
-Base: <base>. Implemente somente <ticket-scope>.
-Confirme com gh que <blocker-urls-or-numbers> estão CLOSED antes de começar.
-Não antecipe tickets de ondas posteriores.
+Invoke $my-implement on issue <canonical-issue-url>.
+Base: <base>. Implement only <ticket-scope>.
+Confirm with gh that <blocker-urls-or-numbers> are CLOSED before starting.
+Do not anticipate tickets from later waves.
 ```
 
-Para um issue sem blockers, substitua a linha de confirmação por
-`Este issue não tem blockers e pode começar agora.` Para o conformance review
-issue, adapte a frase de escopo para executar `/code-review` no eixo Spec e
-registrar cada gap como um ADR ou issue — não é um ticket de implementação de
-código. Para o prompt final do épico, nomeie todos os leaf blockers necessários
-mais o conformance review e indique explicitamente que seu pull request deve
-fechar o épico através do comportamento normal `$my-implement` issue-backed.
+For an issue with no blockers, replace the confirmation line with
+`This issue has no blockers and can start now.` For the conformance review
+issue, adapt the scope sentence to running `/code-review` on the Spec axis
+and recording every gap as an ADR or issue — it is not a code-implementation
+ticket. For the final epic prompt, name all required leaf blockers plus the
+conformance review and state explicitly that its pull request must close the
+epic through the normal `$my-implement` issue-backed behavior.
 
-### Modo dispatch
+### Dispatch mode
 
-No modo `dispatch`, para cada wave em ordem:
+In `dispatch` mode, for each wave in order:
 
-1. **Verificar blockers.** Confirme com `gh issue view <n> --json state` que
-   todos os issues bloqueadores da wave estão CLOSED. Se algum estiver OPEN,
-   pare e avise o usuário.
+1. **Verify blockers.** Confirm with `gh issue view <n> --json state` that
+   all blocker issues for the wave are CLOSED. If any are OPEN, stop and
+   notify the user.
 
-2. **Printar prompts.** Emita os prompts da wave em blocos fenced copyable
-   (para registro), agrupados sob o heading da wave.
+2. **Print prompts.** Emit the wave's prompts in copyable fenced blocks
+   (for record), grouped under the wave heading.
 
-3. **Disparar subagentes.** Para cada ticket da wave, dispare um subagente
-   continuable usando o tool `subagent` com `run_in_background: true`,
-   `description` no formato `#<issue-number> <short-title>`, e `prompt`
-   (o prompt completo do ticket incluindo o caminho absoluto do handoff).
-   Use `maxDepth: 5` para acomodar delegações profundas
+3. **Dispatch subagents.** For each ticket in the wave, dispatch a continuable
+   subagent using the `subagent` tool with `run_in_background: true`,
+   `description` in the format `#<issue-number> <short-title>`, and
+   `prompt` (the complete ticket prompt including the absolute handoff path).
+   Use `maxDepth: 5` to accommodate deep delegations
    (my-implement -> research -> etc.).
 
-4. **Esperar settlement notices.** Aguarde as settlement notices de todos os
-   subagentes da wave. O runtime notifica automaticamente quando cada
-   subagente termina.
+4. **Wait for settlement notices.** Await settlement notices from all subagents
+   in the wave. The runtime automatically notifies when each subagent finishes.
 
-5. **Tratar erros.** Se um subagente falhar (erro, max-tokens, refusal),
-   pergunte ao usuário: tentar novamente, pular, ou abortar a wave inteira.
+5. **Handle errors.** If a subagent fails (error, max-tokens, refusal), ask
+   the user: retry, skip, or abort the entire wave.
 
-6. **Próxima wave.** Repita para a próxima wave.
+6. **Next wave.** Repeat for the next wave.
 
-O prompt do épico (final slice) NÃO é disparado automaticamente. Após todas
-as waves de leaves terminarem, avise o usuário: "Todos os leaves terminaram.
-Dispare o épico manualmente quando pronto." O épico fecha via PR do
-`my-implement`, não via subagente.
+The epic prompt (final slice) is NOT dispatched automatically. After all leaf
+waves finish, notify the user: "All leaves finished. Dispatch the epic manually
+when ready." The epic closes via PR from `my-implement`, not via subagent.
 
-### Formato geral
+### General format
 
-Para um issue sem blockers, substitua a linha de confirmação por
-`Este issue não tem blockers e pode começar agora.` Para o conformance review
-issue, adapte a frase de escopo para executar `/code-review` no eixo Spec e
-registrar cada gap como um ADR ou issue — não é um ticket de implementação de
-código. Para o prompt final do épico, nomeie todos os leaf blockers necessários
-mais o conformance review e indique explicitamente que seu pull request deve
-fechar o épico através do comportamento normal `$my-implement` issue-backed.
+For an issue with no blockers, replace the confirmation line with
+`This issue has no blockers and can start now.` For the conformance review
+issue, adapt the scope sentence to running `/code-review` on the Spec axis
+and recording every gap as an ADR or issue — it is not a code-implementation
+ticket. For the final epic prompt, name all required leaf blockers plus the
+conformance review and state explicitly that its pull request must close the
+epic through the normal `$my-implement` issue-backed behavior.
 
-Do not close the epic directly. No modo print, não abra agents ou inicie
-implementação em nome do usuário; os prompts paste-ready são o deliverable do
-handoff. No modo dispatch, os subagentes são disparados automaticamente, mas
-o épico permanece para dispatch manual pelo usuário.
+Do not close the epic directly. In print mode, do not open agents or start
+implementation on the user's behalf; the paste-ready prompts are the handoff
+deliverable. In dispatch mode, subagents are dispatched automatically, but the
+epic remains for manual dispatch by the user.
