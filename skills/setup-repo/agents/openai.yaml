@@ -1,6 +1,6 @@
 interface:
   display_name: "Setup Repo"
-  short_description: "Bootstrap a repository with Momoi Labs engineering conventions"
+  short_description: "Bootstrap a repository with Momoi Labs engineering conventions, creating it on GitHub when asked"
   default_prompt: "Use $setup-repo to bootstrap this repository."
 policy:
   allow_implicit_invocation: false
