@@ -1,6 +1,6 @@
 ---
 name: setup-repo
-description: Bootstrap a new or existing repository with Momoi Labs engineering conventions — conventional-commits validation for PR titles and commit messages, my-commit as the default commit path, rebase-and-merge as the merge strategy, and PRINCIPLES.md + ADR scaffolding. Idempotent; safe to re-run. Use when setting up a new repository or adopting an existing one.
+description: Bootstrap a new or existing repository with Momoi Labs engineering conventions — create the repository on GitHub when the user asks, configure conventional-commits validation for PR titles and commit messages, my-commit as the default commit path, rebase-and-merge as the merge strategy, and PRINCIPLES.md + ADR scaffolding. Idempotent; safe to re-run. Use when setting up a new repository or adopting an existing one.
 disable-model-invocation: true
 ---
 
@@ -13,6 +13,8 @@ convention. It works for a fresh repository and for adopting an existing one.
 
 ## What this produces
 
+- A GitHub repository created on demand when the current directory is not yet
+  a repository or has no GitHub remote.
 - Issue tracker, triage labels, and domain-doc layout — via the
   `setup-matt-pocock-skills` skill (orchestrated, not reimplemented).
 - A `### Commit convention` block recording that every commit goes through
@@ -26,20 +28,58 @@ convention. It works for a fresh repository and for adopting an existing one.
 
 ### 1. Explore
 
-Look at the current repo; don't assume. Check:
+Look at the current directory; don't assume. Check:
 
+- Is this a Git repository? Run `git rev-parse --git-dir`.
+  - If it fails, the directory is not a repo yet.
 - `git remote -v` — GitHub? GitLab? No remote?
 - `AGENTS.md` / `CLAUDE.md` — which exists? Is there a `## Agent skills` block?
 - `.github/workflows/` — is there already a conventional-commits workflow?
 - `docs/PRINCIPLES.md`, `docs/adr/`, `CONTEXT.md`, `CONTEXT-MAP.md` — present?
 
-### 2. Run setup-matt-pocock-skills
+### 2. Create the repository if the user asks
+
+This step runs only when the current directory is not a Git repository or has
+no GitHub remote. Do not create anything the user did not explicitly ask for.
+
+#### 2a. Not a Git repository
+
+If `git rev-parse --git-dir` fails:
+
+1. Ask the user: "This directory is not a Git repository yet. Do you want me to
+   create one here?"
+2. If yes, run `git init`.
+3. If no, stop and tell the user to run the skill from inside a Git repository.
+
+#### 2b. No GitHub remote
+
+If `git remote -v` returns no GitHub remote (or no remotes at all):
+
+1. Ask the user: "This repository does not have a GitHub remote. Do you want me
+   to create a GitHub repository and wire it as `origin`?"
+2. If yes:
+   - Pick visibility based on what the user wants (`--public`, `--private`, or
+     `--internal` for organizations). Default to `--private` when unsure.
+   - Run `gh repo create` from the current directory so the CLI can infer the
+     repository name and create the remote automatically. Example:
+     ```bash
+     gh repo create --private --source=. --remote=origin --push
+     ```
+   - If the organization matters, use `OWNER/REPO` form:
+     ```bash
+     gh repo create momoi-labs/new-repo --private --source=. --remote=origin --push
+     ```
+   - Verify with `git remote -v`.
+3. If no, skip the GitHub-specific steps below (conventional-commits workflow
+   and merge strategy) and rely on `my-commit` as the local gate. Say so.
+
+### 3. Run setup-matt-pocock-skills
 
 Invoke the `setup-matt-pocock-skills` skill and follow it completely. It
 configures the issue tracker, triage labels, and domain-doc layout, and writes
 the `## Agent skills` block. Do not reimplement it here.
 
-### 3. Add the commit convention block
+### 4. Add the commit convention block
 
 After `setup-matt-pocock-skills` has written (or updated) the `## Agent skills`
 block, add or update this sub-block inside it, in place (never a duplicate):
@@ -52,7 +92,7 @@ messages are validated by the `conventional-commits` workflow; merges use
 rebase-and-merge.
 ```
 
-### 4. Conventional commits validation
+### 5. Conventional commits validation
 
 If the repository has a GitHub remote, write
 `.github/workflows/conventional-commits.yml` from
@@ -65,7 +105,7 @@ the action by its tag: `momoi-labs/actions/conventional-commits@conventional-com
 - If there is no GitHub remote, skip this step and rely on `my-commit` as the
   local gate. Say so.
 
-### 5. Merge strategy: rebase and merge
+### 6. Merge strategy: rebase and merge
 
 If the repository has a GitHub remote, make rebase-and-merge the only merge
 method. GitHub has no API for the *default* merge button — disabling the other
@@ -77,7 +117,7 @@ gh repo edit --enable-rebase-merge=true --enable-merge-commit=false --enable-squ
 
 If there is no GitHub remote, skip this step.
 
-### 6. Engineering principles and ADR scaffolding
+### 7. Engineering principles and ADR scaffolding
 
 Create these only if they are absent; never overwrite existing content:
 
@@ -97,7 +137,7 @@ If `docs/PRINCIPLES.md` already exists with real content, leave it untouched.
 Optional: if the user wants, help adapt or add principles now using
 `/grill-with-docs`. Do not write invented principles without the user.
 
-### 7. Idempotency contract
+### 8. Idempotency contract
 
 | Files this skill owns | Rule |
 | --------------------- | ---- |
