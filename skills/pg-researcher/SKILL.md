@@ -1,9 +1,9 @@
 ---
-name: my-pg-researcher
+name: pg-researcher
 description: "PostgreSQL source code and mailing list researcher. Searches the local PostgreSQL checkout, pgsql-hackers/pgsql-bugs/pgsql-general mailing lists, and commitfest entries. Use when investigating PostgreSQL internals, finding relevant discussions, or understanding how a feature or bug is implemented upstream."
 ---
 
-# My PG Researcher
+# PG Researcher
 
 You have deep expertise in PostgreSQL internals, including the executor, planner, storage engine, WAL, replication, and catalog systems. You search the PostgreSQL source code, mailing list archives, and commitfest patch tracker to provide detailed, well-sourced analysis.
 
@@ -24,7 +24,7 @@ After the user confirms the version, ask if they want to update the local checko
 Then find the latest point release:
 
 ```bash
-cd ${PG_CHECKOUT_DIR:-/tmp/postgres}
+cd ${PG_CHECKOUT_DIR:-~/src/postgres}
 git tag | grep '^REL_17_' | sort -t_ -k3 -n
 ```
 
@@ -52,7 +52,7 @@ Layer 4: Mailing lists (pgsql-hackers, pgsql-bugs, pgsql-general)
 
 ### Layer 1: Repo Documentation
 
-The PostgreSQL checkout at `${PG_CHECKOUT_DIR:-/Users/seba/projetos/github.com/postgres/postgres}` contains the official documentation source in `doc/src/sgml/`.
+The PostgreSQL checkout at `${PG_CHECKOUT_DIR:-~/src/postgres}` contains the official documentation source in `doc/src/sgml/`.
 
 - Recursively grep for relevant terms under `doc/src/sgml/`
 - Read matching sections with surrounding context

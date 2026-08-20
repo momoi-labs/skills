@@ -23,21 +23,38 @@ npx skills@latest add mattpocock/skills
 npx skills@latest add momoi-labs/skills
 ```
 
-For a non-interactive Codex installation:
+The interactive form above prompts for which agents to install to. To choose
+them explicitly, pass `--agent`. These skills are used across Claude Code,
+Codex, and Cursor:
+
+| Agent       | `--agent`     |
+| ----------- | ------------- |
+| Claude Code | `claude-code` |
+| Codex       | `codex`       |
+| Cursor      | `cursor`      |
+
+For a non-interactive global installation into all three:
 
 ```bash
 npx skills@latest add mattpocock/skills \
   --skill '*' \
+  --agent claude-code \
   --agent codex \
+  --agent cursor \
   --global \
   --yes
 
 npx skills@latest add momoi-labs/skills \
   --skill '*' \
+  --agent claude-code \
   --agent codex \
+  --agent cursor \
   --global \
   --yes
 ```
+
+Drop `--global` to install into the current project instead. Confirm what landed
+with `npx skills@latest list --global`.
 
 ## Setup
 
@@ -97,7 +114,7 @@ These wrap Matt Pocock's original skills with personal conventions (path naming,
 | `my-to-tickets`    | `to-tickets` | GitHub native `--parent` / `--blocked-by`, reconciliation, shared handoff, unlock waves        |
 | `my-implement`     | `implement`  | Native Git worktree, `seba/` branches, local validation loop, `my-commit`, PR publication       |
 | `my-commit`        | (none)       | Personal commit gate — inspect, stage explicitly, validate                                     |
-| `my-pg-researcher` | (none)       | PostgreSQL source code and mailing list researcher                                             |
+| `pg-researcher`    | (none)       | PostgreSQL source code and mailing list researcher                                             |
 | `setup-repo`        | (none)       | One-shot bootstrap: conventional-commits validation, `my-commit` as default commit, rebase-and-merge, `PRINCIPLES.md` + ADR scaffolding |
 
 ## Repository layout
