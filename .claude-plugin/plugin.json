@@ -7,8 +7,8 @@
     "./skills/my-commit",
     "./skills/my-handoff",
     "./skills/my-implement",
-    "./skills/my-pg-researcher",
     "./skills/my-to-tickets",
+    "./skills/pg-researcher",
     "./skills/setup-repo"
   ]
 }
