@@ -25,15 +25,16 @@ npx skills@latest add momoi-labs/skills
 
 The interactive form above prompts for which agents to install to. To choose
 them explicitly, pass `--agent`. These skills are used across Claude Code,
-Codex, and Cursor:
+Codex, Cursor, and OpenCode:
 
 | Agent       | `--agent`     |
 | ----------- | ------------- |
 | Claude Code | `claude-code` |
 | Codex       | `codex`       |
 | Cursor      | `cursor`      |
+| OpenCode    | `opencode`    |
 
-For a non-interactive global installation into all three:
+For a non-interactive global installation into all four:
 
 ```bash
 npx skills@latest add mattpocock/skills \
@@ -41,6 +42,7 @@ npx skills@latest add mattpocock/skills \
   --agent claude-code \
   --agent codex \
   --agent cursor \
+  --agent opencode \
   --global \
   --yes
 
@@ -49,6 +51,7 @@ npx skills@latest add momoi-labs/skills \
   --agent claude-code \
   --agent codex \
   --agent cursor \
+  --agent opencode \
   --global \
   --yes
 ```
