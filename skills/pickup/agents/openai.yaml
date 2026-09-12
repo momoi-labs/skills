@@ -1,0 +1,6 @@
+interface:
+  display_name: "Pickup"
+  short_description: "Reconcile a handoff into a session task list"
+  default_prompt: "Use $pickup with the path to the handoff document to continue work from another computer."
+policy:
+  allow_implicit_invocation: false

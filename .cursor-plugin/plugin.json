@@ -13,6 +13,7 @@
     "./skills/my-implement",
     "./skills/my-to-tickets",
     "./skills/pg-researcher",
+    "./skills/pickup",
     "./skills/setup-repo"
   ]
 }
