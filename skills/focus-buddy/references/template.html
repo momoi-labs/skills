@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="{{LANG}}">
+<!-- Localize all reader-facing HTML and JavaScript strings to the current
+     conversation language, including existing content on updates. English
+     labels below are examples. Preserve commands, paths, IDs and storage keys. -->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+  /* Colors from Kiso tokens: github.com/momoi-labs/blueprint */
+  :root {
+    color-scheme: light dark;
+    --bg: light-dark(#f4f2ee, #211f1c);
+    --surface: light-dark(#faf9f7, #2d2b28);
+    --fg: light-dark(#1b1a1e, #eeece9);
+    --muted: light-dark(#5f5b57, #aba9a5);
+    --line: light-dark(#e0dcd6, #494744);
+    --accent: light-dark(#5b3fc4, #a793f4);
+    --accent-soft: light-dark(#f7f4ff, #2d2843);
+    --primary: light-dark(#5b3fc4, #684bb5);
+    --primary-hover: light-dark(#46309e, #795dc9);
+    --on-primary: light-dark(#ffffff, #f7f5fe);
+    --done: light-dark(#0c6b43, #5bd295);
+  }
+  [data-theme="light"] { color-scheme: light; }
+  [data-theme="dark"] { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; max-width: 48rem; padding: 3rem 2rem 4rem;
+    background: var(--bg); color: var(--fg);
+    font: 100%/1.6 Inter, system-ui, -apple-system, sans-serif;
+    overflow-wrap: anywhere;
+  }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+  .meta { color: var(--muted); font-size: 0.75rem; margin: 0; }
+  .facts { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; margin: 0 0 2rem; }
+  .chip { font-size: 0.75rem; color: var(--muted); }
+  #chip-count { border: 1px solid var(--line); border-radius: 4px; padding: 0.125rem 0.5rem; }
+  button {
+    font: inherit; font-size: 0.875rem; font-weight: 500; cursor: pointer;
+    min-height: 36px; padding: 0 0.75rem; border-radius: 6px;
+    background: var(--surface); color: var(--fg); border: 1px solid var(--line);
+  }
+  button:hover { background: var(--accent-soft); }
+  .theme-toggle { color: var(--muted); font-size: 0.75rem; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  h1 { font-size: 1.875rem; font-weight: 500; letter-spacing: -0.02rem; line-height: 1.2; margin: 0 0 1rem; }
+  .tldr { margin: 0 0 2rem; max-width: 65ch; }
+  .tldr p { margin: 0.75rem 0; }
+  .tldr p:first-child { font-size: 1.125rem; line-height: 1.5; }
+  .tldr p + p { color: var(--muted); }
+  .next { border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 6px; padding: 1.5rem; margin: 0 0 2rem; background: var(--surface); }
+  .next .label { font-size: 0.75rem; font-weight: 600; color: var(--accent); margin: 0 0 0.5rem; }
+  .next .task { font-size: 1.125rem; font-weight: 600; margin: 0; }
+  .next button { margin-top: 1rem; background: var(--primary); color: var(--on-primary); border-color: transparent; }
+  .next button:hover { background: var(--primary-hover); }
+  .next.all-done { border-left-color: var(--done); }
+  .next.all-done .label { color: var(--done); }
+  .progress { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  .progress .bar { height: 100%; width: 0; background: var(--done); border-radius: 4px; }
+  .count { color: var(--muted); font-size: 0.75rem; margin: 0.5rem 0 2rem; }
+  details { border-top: 1px solid var(--line); padding: 1rem 0; margin: 0; }
+  summary { font-weight: 600; cursor: pointer; }
+  summary::marker { color: var(--muted); font-size: 0.75rem; }
+  details[open] > summary { margin-bottom: 1rem; }
+  ul.tasks { list-style: none; padding: 0; margin: 0; }
+  ul.tasks li { border-top: 1px solid var(--line); padding: 1rem 0; }
+  ul.tasks li:first-child { border-top: 0; }
+  ul.tasks li.is-next { border-left: 3px solid var(--accent); padding-left: 1rem; }
+  ul.tasks li:last-child { padding-bottom: 0; }
+  ul.tasks label { display: flex; gap: 0.75rem; align-items: flex-start; cursor: pointer; }
+  ul.tasks input { flex: none; width: 1.125rem; height: 1.125rem; accent-color: var(--done); margin: 0.25rem 0 0; }
+  ul.tasks .body { min-width: 0; }
+  ul.tasks .text { font-weight: 600; }
+  ul.tasks .detail { display: block; color: var(--muted); font-size: 0.875rem; margin-top: 0.25rem; }
+  li.is-done .text { color: var(--muted); text-decoration: line-through; }
+  .context { font-size: 0.875rem; }
+  .context > summary { font-size: 1rem; }
+  .context p { margin: 0.75rem 0; }
+  .context ul { padding-left: 1.25rem; }
+  .context li { margin: 0.5rem 0; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.875em; }
+  footer { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+  footer button { background: transparent; color: var(--muted); }
+  #fb-mode { margin-left: auto; }
+  @media (max-width: 520px) {
+    body { padding: 1.5rem 1rem 3rem; }
+    .topbar { margin-bottom: 1.5rem; }
+    h1 { font-size: 1.5rem; }
+    .next { padding: 1rem; }
+  }
+  @media (pointer: coarse) { button, summary, ul.tasks label { min-height: 44px; } }
+  body.commenting, body.commenting * { cursor: crosshair; }
+  .has-fb { outline: 2px dashed var(--accent); outline-offset: 3px; }
+  .fb-panel, .fb-form {
+    position: fixed; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 0.6rem; padding: 0.75rem; font-size: 0.9rem; z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  }
+  .fb-panel { display: none; right: 1rem; bottom: 1rem; width: 19rem; max-width: calc(100vw - 2rem); }
+  .fb-panel.visible { display: block; }
+  .fb-panel ul { list-style: none; padding: 0; margin: 0.5rem 0; }
+  .fb-panel li { display: flex; justify-content: space-between; gap: 0.5rem; border-top: 1px solid var(--line); padding: 0.35rem 0; }
+  .fb-panel li button { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 0; }
+  .fb-form { display: none; left: 50%; transform: translateX(-50%); bottom: 1rem; width: 24rem; max-width: calc(100vw - 2rem); border-color: var(--accent); }
+  .fb-form.visible { display: block; }
+  .fb-form textarea, .fb-out { background: var(--bg); color: var(--fg); border: 1px solid var(--line); padding: 0.5rem; }
+  .fb-panel { max-height: 50vh; overflow: auto; }
+  .fb-form textarea { width: 100%; min-height: 4rem; font: inherit; margin-bottom: 0.5rem; }
+  .fb-out { width: 100%; min-height: 5rem; display: none; margin-top: 0.5rem; font-size: 0.8rem; }
+
+  /* Source document with task margin. */
+  body { max-width: 78rem; }
+  .document-layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(19rem, 1fr); gap: 2rem; align-items: start; }
+  .source-column, .task-margin { min-width: 0; }
+  .task-margin { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; padding: 0 0.5rem 0 1.5rem; border-left: 1px solid var(--line); }
+  .source-document { font-size: 1rem; }
+  .source-document h2 { font-size: 1.5rem; line-height: 1.3; }
+  .source-document h3 { font-size: 1.125rem; }
+  .source-document section { padding: 1rem; border-top: 1px solid var(--line); scroll-margin-top: 1rem; }
+  .source-document li { margin: 0.5rem 0; }
+  .source-document ul, .source-document ol { padding-left: 1.5rem; }
+  .source-document .eyebrow, .source-document .notice, .source-hint { color: var(--muted); font-size: 0.875rem; }
+  .source-document .source-selected { border-left: 3px solid var(--accent); background: var(--accent-soft); }
+  .task-row { display: flex; gap: 0.75rem; align-items: flex-start; }
+  ul.tasks li[data-source] { cursor: pointer; }
+  ul.tasks .body[role="button"] { flex: 1; border-radius: 4px; }
+  ul.tasks .body[role="button"]:hover .text { color: var(--accent); }
+  @media (max-width: 800px) {
+    .document-layout { display: flex; flex-direction: column; }
+    .task-margin { position: static; max-height: none; order: -1; width: 100%; border-left: 0; padding: 0; }
+  }
+
+  .source-column[hidden] { display: none; }
+  body:not(.showing-details) { max-width: 48rem; }
+  body:not(.showing-details) .document-layout { display: block; }
+  body:not(.showing-details) .task-margin { position: static; max-height: none; padding: 0; border: 0; }
+  .details-toggle { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; cursor: pointer; }
+  .details-toggle input { width: 1.125rem; height: 1.125rem; accent-color: var(--primary); }
+</style>
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("focusdoc-theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body data-plan-id="{{SLUG}}">
+  <div class="topbar">
+    <p class="meta">Updated {{DATE}} · focus doc</p>
+    <button type="button" class="theme-toggle" id="theme-toggle">Auto</button>
+  </div>
+  <h1 data-fb="title">{{TITLE}}</h1>
+  <p class="facts" data-fb="facts">
+    <span class="chip" id="chip-count"></span>
+    <span class="chip">{{PROJECT}}</span>
+    <span class="chip">{{SCOPE}}</span>
+  </p>
+  <div class="tldr" data-fb="tldr">
+    <!-- At least two short paragraphs: status, then recap. Add paragraphs for useful information, one idea each. -->
+    <p><strong>{{STATUS_SENTENCE}}</strong></p>
+    <p>{{RECAP_PARAGRAPH}}</p>
+  </div>
+
+  <!-- Optional: include the "Do this now" card only when a single action
+       clearly leads. Remove the section when the list itself drives the
+       work; the script copes with its absence. -->
+  <section class="next" id="next" data-fb="next">
+    <p class="label" id="next-label">Do this now</p>
+    <p class="task" id="next-task"></p>
+    <button type="button" id="next-done">Mark done</button>
+  </section>
+
+  <div class="progress" data-fb="progress"><div class="bar" id="bar"></div></div>
+  <p class="count" id="count"></p>
+
+  <label class="details-toggle"><input type="checkbox" id="show-details" aria-controls="source-column" autocomplete="off"> Show details</label>
+  <main class="document-layout">
+    <div class="source-column" id="source-column" hidden>
+      <article class="source-document" data-fb="source">
+<!-- Embed the source content in the conversation language. Keep its provenance,
+          source link and snapshot date. Distinguish later notes from source text.
+          Each task's data-source points to a unique section id below. -->
+      <header><h2>{{SOURCE_TITLE}}</h2><p>{{SOURCE_PROVENANCE}}</p><a href="{{SOURCE_URL}}">Open original</a></header>
+      <section id="{{SOURCE_SECTION_ID}}"><h3>{{SOURCE_SECTION_TITLE}}</h3>{{SOURCE_CONTENT}}</section>
+      </article>
+    <details class="context" data-fb="context" open>
+      <summary>Context</summary>
+      <!-- Up to four more collapsible chunks (decisions, how to use, session log).
+           One idea per paragraph, bold the load-bearing words, lists over prose,
+           muted detail lines instead of dropped information. -->
+      {{CONTEXT}}
+      <!-- Session log chunk, last, for dense sessions:
+      <details><summary>Session log</summary>
+        <ul><li>One line per thing that happened, in order.</li></ul>
+      </details> -->
+    </details>
+    </div>
+    <aside class="task-margin" aria-label="Tasks linked to source">
+      <p class="source-hint">Click a task to highlight its source. Only the checkbox marks completion.</p>
+    <details open data-fb="tasks">
+      <summary>Tasks</summary>
+      <ul class="tasks" id="task-list">
+        <!-- Order = do-order. The first pending task is the "Do this now" card.
+             Bold title = the action; detail line = the where and the what.
+             Wrap commands in <code>...</code>; keep explanations outside code. -->
+        <li data-source="{{SOURCE_SECTION_ID}}">
+          <div class="task-row">
+            <input type="checkbox" aria-label="Complete: {{TASK_TEXT}}" data-task="{{TASK_ID}}">
+            <span class="body" role="button" tabindex="0" aria-label="Read source: {{TASK_TEXT}}">
+              <span class="text">{{TASK_TEXT}}</span>
+              <span class="detail">{{TASK_DETAIL}}</span>
+            </span>
+          </div>
+        </li>
+      </ul>
+    </details>
+
+</aside>
+  </main>
+
+  <footer data-fb="footer">
+    <button type="button" id="reset">Reset checkboxes</button>
+    <button type="button" id="fb-mode">Comment mode</button>
+  </footer>
+
+  <aside class="fb-panel" id="fb-panel">
+    <strong>Feedback</strong>
+    <ul id="fb-list"></ul>
+    <button type="button" id="fb-copy">Copy for agent</button>
+    <button type="button" id="fb-clear">Clear all</button>
+    <textarea aria-label="Feedback to copy" class="fb-out" id="fb-out" readonly></textarea>
+  </aside>
+
+  <form class="fb-form" id="fb-form">
+    <label for="fb-text">Your comment</label>
+    <textarea id="fb-text" placeholder="What is wrong here?"></textarea>
+    <button type="button" id="fb-save">Save</button>
+    <button type="button" id="fb-cancel">Cancel</button>
+  </form>
+
+<script>
+(function () {
+  var key = "focusdoc:" + document.body.dataset.planId;
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(key)) || {}; } catch (e) {}
+  var taskList = document.getElementById("task-list");
+  var boxes = Array.prototype.slice.call(taskList.querySelectorAll("input[data-task]"));
+
+  var detailsToggle = document.getElementById('show-details');
+  function setDetails(visible) {
+    detailsToggle.checked = visible;
+    document.getElementById('source-column').hidden = !visible;
+    document.body.classList.toggle('showing-details', visible);
+  }
+  // Each document opening starts with tasks only, including browser history restoration.
+  setDetails(false);
+  window.addEventListener('pageshow', function () { setDetails(false); });
+  detailsToggle.addEventListener('change', function () { setDetails(this.checked); });
+
+  function revealSource(row) {
+    var target = document.getElementById(row.dataset.source);
+    if (!target) return;
+    setDetails(true);
+    document.querySelectorAll('.source-selected').forEach(function (el) { el.classList.remove('source-selected'); });
+    target.classList.add('source-selected');
+    target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }
+  document.querySelectorAll('li[data-source]').forEach(function (row) {
+    row.addEventListener('click', function (event) {
+      if (document.body.classList.contains('commenting') || event.target.closest('input, a, button')) return;
+      revealSource(row);
+    });
+    row.querySelector('[role="button"]').addEventListener('keydown', function (event) {
+      if (document.body.classList.contains('commenting')) return;
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); revealSource(row); }
+    });
+  });
+
+
+  var themeBtn = document.getElementById("theme-toggle");
+  var themeOrder = ["auto", "light", "dark"];
+  var themeLabels = { auto: "Auto", light: "Light", dark: "Dark" };
+
+  function currentTheme() {
+    var t = document.documentElement.getAttribute("data-theme");
+    return t === "light" || t === "dark" ? t : "auto";
+  }
+
+  function setTheme(t) {
+    if (t === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", t);
+    themeBtn.textContent = themeLabels[t];
+    try { localStorage.setItem("focusdoc-theme", t); } catch (e) {}
+  }
+
+  themeBtn.addEventListener("click", function () {
+    setTheme(themeOrder[(themeOrder.indexOf(currentTheme()) + 1) % themeOrder.length]);
+  });
+  themeBtn.textContent = themeLabels[currentTheme()];
+
+  function isDone(box) {
+    return Object.prototype.hasOwnProperty.call(state, box.dataset.task)
+      ? state[box.dataset.task] === true : box.hasAttribute("checked");
+  }
+
+  function render() {
+    var done = 0;
+    boxes.forEach(function (box) {
+      var d = isDone(box);
+      box.checked = d;
+      if (d) done++;
+      box.closest("li").classList.toggle("is-done", d);
+    });
+    var total = boxes.length;
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    var pendingN = 0;
+    boxes.forEach(function (b) { if (!isDone(b) && taskList.contains(b)) pendingN++; });
+    document.getElementById("chip-count").textContent = pendingN + " remaining";
+    document.getElementById("bar").style.width = pct + "%";
+    document.getElementById("count").textContent =
+      pendingN + " of " + total + " remaining" + (total && pct === 100 ? ": all clear" : "");
+    var next = null;
+    for (var i = 0; i < boxes.length; i++) {
+      if (!isDone(boxes[i]) && taskList.contains(boxes[i])) { next = boxes[i]; break; }
+    }
+    boxes.forEach(function (box) { box.closest("li").classList.toggle("is-next", box === next); });
+    var label = document.getElementById("next-label");
+    var task = document.getElementById("next-task");
+    var btn = document.getElementById("next-done");
+    var card = document.getElementById("next");
+    if (!card || !label || !task || !btn) return;
+    if (next) {
+      document.getElementById("next").classList.remove("all-done");
+      label.textContent = "Do this now";
+      task.textContent = next.closest("li").querySelector(".text").textContent;
+      btn.style.display = "";
+      btn.dataset.task = next.dataset.task;
+    } else {
+      document.getElementById("next").classList.add("all-done");
+      label.textContent = "All done";
+      task.textContent = "Everything is checked. Close the laptop.";
+      btn.style.display = "none";
+    }
+  }
+
+  function save() {
+    try { localStorage.setItem(key, JSON.stringify(state)); } catch (e) {}
+  }
+
+  boxes.forEach(function (box) {
+    box.addEventListener("change", function () {
+      state[box.dataset.task] = box.checked;
+      save();
+      render();
+    });
+  });
+
+  var nextDone = document.getElementById("next-done");
+  if (nextDone) nextDone.addEventListener("click", function () {
+    state[this.dataset.task] = true;
+    save();
+    render();
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    state = {};
+    save();
+    render();
+  });
+
+  var fbKey = key + ":fb";
+  var fb = [];
+  try { fb = JSON.parse(localStorage.getItem(fbKey)) || []; } catch (e) {}
+  var fbMode = false;
+  var fbModeBtn = document.getElementById("fb-mode");
+  var fbPanel = document.getElementById("fb-panel");
+  var fbForm = document.getElementById("fb-form");
+  var fbText = document.getElementById("fb-text");
+  var fbWhere = null;
+
+  function fbLabel(c) { return c.task ? "task " + c.task : c.block; }
+
+  function fbSave() {
+    try { localStorage.setItem(fbKey, JSON.stringify(fb)); } catch (e) {}
+  }
+
+  function fbMark() {
+    Array.prototype.forEach.call(document.querySelectorAll(".has-fb"), function (el) {
+      el.classList.remove("has-fb");
+    });
+    fb.forEach(function (c) {
+      var el = c.task
+        ? document.querySelector('[data-task="' + c.task + '"]')
+        : document.querySelector('[data-fb="' + c.block + '"]');
+      if (el && el.tagName === "INPUT") el = el.closest("li");
+      if (el && fbMode) el.classList.add("has-fb");
+    });
+  }
+
+  function fbRender() {
+    var list = document.getElementById("fb-list");
+    list.innerHTML = "";
+    fb.forEach(function (c) {
+      var li = document.createElement("li");
+      var b = document.createElement("strong");
+      b.textContent = fbLabel(c);
+      li.appendChild(b);
+      li.appendChild(document.createTextNode(c.text));
+      var del = document.createElement("button");
+      del.type = "button";
+      del.textContent = "x";
+      del.addEventListener("click", function () {
+        fb.splice(fb.indexOf(c), 1);
+        fbSave(); fbRender(); fbMark();
+      });
+      li.appendChild(del);
+      list.appendChild(li);
+    });
+    fbPanel.classList.toggle("visible", fbMode);
+    document.getElementById("fb-copy").style.display = fb.length ? "" : "none";
+    document.getElementById("fb-clear").style.display = fb.length ? "" : "none";
+  }
+
+  fbModeBtn.addEventListener("click", function () {
+    fbMode = document.body.classList.toggle("commenting");
+    fbModeBtn.textContent = fbMode ? "Commenting: click an element" : "Comment mode";
+    fbRender(); fbMark();
+    if (!fbMode) fbForm.classList.remove("visible");
+  });
+
+  document.body.addEventListener("click", function (e) {
+    if (!fbMode) return;
+    if (fbPanel.contains(e.target) || fbForm.contains(e.target) || fbModeBtn.contains(e.target)) return;
+    var taskRow = e.target.closest("li");
+    var taskBox = e.target.closest("[data-task]") || (taskRow && taskRow.querySelector("input[data-task]"));
+    var block = e.target.closest("[data-fb]");
+    if (!taskBox && !block) return;
+    e.preventDefault();
+    e.stopPropagation();
+    fbWhere = taskBox ? { task: taskBox.dataset.task } : { block: block.dataset.fb };
+    fbText.value = "";
+    fbForm.classList.add("visible");
+    fbText.focus();
+  }, true);
+
+  document.getElementById("fb-save").addEventListener("click", function () {
+    if (fbWhere && fbText.value.trim()) {
+      fb.push({ block: fbWhere.block, task: fbWhere.task || null, text: fbText.value.trim() });
+      fbSave(); fbRender(); fbMark();
+    }
+    fbForm.classList.remove("visible");
+    fbWhere = null;
+  });
+
+  document.getElementById("fb-cancel").addEventListener("click", function () {
+    fbForm.classList.remove("visible");
+    fbWhere = null;
+  });
+
+  document.getElementById("fb-copy").addEventListener("click", function () {
+    var lines = ["## Focus doc feedback: " + document.body.dataset.planId, ""];
+    fb.forEach(function (c) { lines.push("- " + fbLabel(c) + ": " + c.text); });
+    var out = lines.join("\n");
+    var ta = document.getElementById("fb-out");
+    ta.value = out;
+    ta.style.display = "block";
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    try { navigator.clipboard.writeText(out); } catch (e) {}
+  });
+
+  document.getElementById("fb-clear").addEventListener("click", function () {
+    fb = [];
+    fbSave(); fbRender(); fbMark();
+    document.getElementById("fb-out").style.display = "none";
+  });
+
+  fbRender();
+  fbMark();
+
+  render();
+})();
+</script>
+</body>
+</html>

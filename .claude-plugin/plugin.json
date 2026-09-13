@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "skills": [
     "./skills/create-image",
+    "./skills/focus-buddy",
     "./skills/my-commit",
     "./skills/my-handoff",
     "./skills/my-implement",

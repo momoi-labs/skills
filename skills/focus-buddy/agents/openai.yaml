@@ -1,0 +1,6 @@
+interface:
+  display_name: "Focus Buddy"
+  short_description: "ADHD-friendly HTML summary with living TODOs"
+  default_prompt: "Use Focus Buddy to summarize this session in a focus doc."
+policy:
+  allow_implicit_invocation: true
