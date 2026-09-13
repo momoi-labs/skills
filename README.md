@@ -118,6 +118,7 @@ These wrap Matt Pocock's original skills with personal conventions (path naming,
 | `my-implement`     | `implement`  | Native Git worktree, `seba/` branches, local validation loop, `my-commit`, PR publication       |
 | `my-commit`        | (none)       | Personal commit gate — inspect, stage explicitly, validate                                     |
 | `pickup`          | (none)       | Receiving side of `my-handoff` — reconciles a handoff against repo state, builds the session task list |
+| `focus-buddy`      | (none)       | Focus Buddy: HTML summaries with current tasks, persistent checkboxes, and source details on demand |
 | `pg-researcher`    | (none)       | PostgreSQL source code and mailing list researcher                                             |
 | `setup-repo`        | (none)       | One-shot bootstrap: conventional-commits validation, `my-commit` as default commit, rebase-and-merge, `PRINCIPLES.md` + ADR scaffolding |
 
