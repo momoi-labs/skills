@@ -1,6 +1,6 @@
 ---
 name: my-implement
-description: Implement work from either a GitHub issue or an already-resolved brainstorm, grill, or implementation plan through the user's personal workflow around the externally maintained implement skill. Use when work should run in an isolated native Git worktree, use seba-prefixed branches and my-commit, wait for local user validation, publish a ready pull request without requiring an issue, wait for that PR to merge, and remove the worktree.
+description: Implement work from either a GitHub issue or an already-resolved brainstorm, grill, or implementation plan through the user's personal workflow around the externally maintained implement skill. Use when work should run in an isolated native Git worktree (a new seba-prefixed one, or the T3 Code worktree the session already runs in), use my-commit, wait for local user validation, publish a ready pull request without requiring an issue, wait for that PR to merge, and remove the worktree when this skill created it.
 ---
 
 # My Implement
@@ -46,10 +46,30 @@ Fetch `origin` before resolving the base:
 - If a custom base exists only locally, explain that and ask before using it.
 - If the base does not exist, stop.
 
-Record the exact base commit before creating the task branch. Use that immutable
-commit later when compacting task commits.
+Record the exact base commit and use that immutable commit later when compacting
+task commits. For a new task branch, it is the updated base tip. Inside a T3 Code
+worktree (see section 2), it is `git merge-base HEAD origin/<base>`.
 
-## 2. Create the isolated worktree and branch
+## 2. Resolve the isolated worktree and branch
+
+### Reuse the T3 Code worktree
+
+T3 Code starts the session inside a worktree it owns. Detect it with
+`git rev-parse --show-toplevel` and `git branch --show-current`: the path is under
+`~/.t3/worktrees/<repository-name>/` and the branch has the `t3code/` prefix.
+When both match, reuse that worktree and branch and skip the rest of this
+section:
+
+- Do not create another worktree and do not rename the branch. T3 Code tracks
+  both by name and would lose the thread.
+- Record the current path as `<absolute-worktree-path>` and the current branch
+  as `<branch-name>`. No `<main-checkout-path>` is needed.
+- Continue only when the worktree is clean, the branch is unpushed and
+  unpublished, and the recorded base is an ancestor of `HEAD`. If there are
+  commits since the base, show them and their changed paths, then require the
+  user to confirm that they all belong to this work. Otherwise stop and ask.
+
+### Create a new worktree
 
 Derive a lowercase kebab-case feature slug from the resolved work title and
 prefix it with `seba/`. For example, `Add Recurring Expenses` becomes
@@ -96,6 +116,7 @@ Confirm that the new worktree is clean, then perform every subsequent operation
 inside it. Keep it through implementation, validation, publication, and any
 post-publication fixes. Do not remove it early unless the user explicitly asks to
 abandon it. After the pull request merges, remove it as required in section 6.
+Record that this skill created the worktree; section 6 removes only those.
 
 ## 3. Implement and commit
 
@@ -248,7 +269,11 @@ post-publication fixes from the Published branches rules below remain allowed;
 after any such fix, resume polling the same PR until it merges. If the user
 reports that the PR merged, verify with `gh` before removing the worktree.
 
-When `state` is `MERGED`:
+When `state` is `MERGED` inside a T3 Code worktree, do not remove it: T3 Code
+owns its lifecycle. Report the PR URL and that the worktree stays under T3 Code.
+The workflow ends here.
+
+When `state` is `MERGED` and this skill created the worktree:
 
 1. Leave or avoid depending on a shell whose cwd is inside the isolated worktree.
 2. Confirm its working tree is clean. If it is not, stop and ask the user whether
@@ -263,15 +288,17 @@ git -C <main-checkout-path> worktree remove <absolute-worktree-path>
    path is no longer registered.
 5. Report the PR URL and that the worktree was removed. The workflow ends here.
 
-If the PR is `CLOSED` without merge, do not remove automatically. Ask whether to
-keep the worktree for follow-up work or remove it. Remove only after an explicit
-choice. Before removing it, confirm it is clean; if the user explicitly chooses
-to discard uncommitted changes, use
+If the PR is `CLOSED` without merge, do not remove automatically. In a T3 Code
+worktree, report it and stop. Otherwise, ask whether to keep the worktree for
+follow-up work or remove it. Remove only after an explicit choice. Before
+removing it, confirm it is clean; if the user explicitly chooses to discard
+uncommitted changes, use
 `git -C <main-checkout-path> worktree remove --force <absolute-worktree-path>`.
 
-Remove a merged PR's clean worktree promptly. Never run `git worktree remove`
-before merge unless the user explicitly asks to abandon the worktree. Preserve a
-dirty worktree until the user explicitly chooses whether to discard or keep it.
+Remove a merged PR's clean worktree promptly when this skill created it. Never
+run `git worktree remove` on a T3 Code worktree, and never run it before merge
+unless the user explicitly asks to abandon the worktree. Preserve a dirty
+worktree until the user explicitly chooses whether to discard or keep it.
 
 ## Published branches
 

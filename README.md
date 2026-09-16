@@ -115,7 +115,7 @@ These wrap Matt Pocock's original skills with personal conventions (path naming,
 | ------------------ | ------------ | ---------------------------------------------------------------------------------------------- |
 | `my-handoff`       | `handoff`    | Dated docs, OS temp path, slug naming, paste-ready prompt                                      |
 | `my-to-tickets`    | `to-tickets` | GitHub native `--parent` / `--blocked-by`, reconciliation, shared handoff, unlock waves        |
-| `my-implement`     | `implement`  | Native Git worktree, `seba/` branches, local validation loop, `my-commit`, PR publication       |
+| `my-implement`     | `implement`  | Native or T3 Code worktree, `seba/` branches, local validation loop, `my-commit`, PR publication |
 | `my-commit`        | (none)       | Personal commit gate — inspect, stage explicitly, validate                                     |
 | `pickup`          | (none)       | Receiving side of `my-handoff` — reconciles a handoff against repo state, builds the session task list |
 | `focus-buddy`      | (none)       | Focus Buddy: HTML summaries with current tasks, persistent checkboxes, and source details on demand |
