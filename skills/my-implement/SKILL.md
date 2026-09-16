@@ -1,6 +1,6 @@
 ---
 name: my-implement
-description: Implement work from either a GitHub issue or an already-resolved brainstorm, grill, or implementation plan through the user's personal workflow around the externally maintained implement skill. Use when work should run in an isolated native Git worktree (a new seba-prefixed one, or the T3 Code worktree the session already runs in), use my-commit, wait for local user validation, publish a ready pull request without requiring an issue, wait for that PR to merge, and remove the worktree when this skill created it.
+description: Implement work from either a GitHub issue or an already-resolved brainstorm, grill, or implementation plan through the user's personal workflow around the externally maintained implement skill. Use when work should run in an isolated native Git worktree (a new one, or the T3 Code worktree the session already runs in), use my-commit, wait for local user validation, publish a ready pull request without requiring an issue, wait for that PR to merge, and remove the worktree when this skill created it.
 ---
 
 # My Implement
