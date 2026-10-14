@@ -59,6 +59,23 @@ npx skills@latest add momoi-labs/skills \
 Drop `--global` to install into the current project instead. Confirm what landed
 with `npx skills@latest list --global`.
 
+### Claude Code and Cursor plugins
+
+The repository is also a plugin marketplace with two plugins. Install only the
+group you want:
+
+| Plugin          | Skills                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------ |
+| `workflow`      | `create-image`, `my-commit`, `my-handoff`, `my-implement`, `my-to-tickets`, `pg-researcher`, `pickup`, `setup-repo` |
+| `adhd-friendly` | `focus-buddy`, `video-study`                                                                           |
+
+In Claude Code:
+
+```bash
+/plugin install workflow --marketplace momoi-labs/skills
+/plugin install adhd-friendly --marketplace momoi-labs/skills
+```
+
 ## Setup
 
 Run **`/setup-repo`** to bootstrap a repository. It orchestrates **`/setup-matt-pocock-skills`** (issue tracker, triage labels, domain docs), records **`my-commit`** as the default commit path, adds conventional-commits validation (PR title and commit messages), sets rebase-and-merge as the merge strategy, and scaffolds `docs/PRINCIPLES.md` + ADRs. Idempotent — safe to re-run.
