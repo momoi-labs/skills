@@ -76,6 +76,11 @@ In Claude Code:
 /plugin install adhd-friendly --marketplace momoi-labs/skills
 ```
 
+Plugin skills carry the plugin name as a prefix, such as `/workflow:my-commit`.
+
+In Cursor, add `momoi-labs/skills` as a plugin marketplace and pick the
+plugins there. The Cursor manifest has not been tested yet.
+
 ## Setup
 
 Run **`/setup-repo`** to bootstrap a repository. It orchestrates **`/setup-matt-pocock-skills`** (issue tracker, triage labels, domain docs), records **`my-commit`** as the default commit path, adds conventional-commits validation (PR title and commit messages), sets rebase-and-merge as the merge strategy, and scaffolds `docs/PRINCIPLES.md` + ADRs. Idempotent — safe to re-run.
