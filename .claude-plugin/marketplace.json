@@ -1,0 +1,37 @@
+{
+  "name": "momoi-labs",
+  "description": "Personal agent skills from Momoi Labs.",
+  "owner": {
+    "name": "Momoi Labs"
+  },
+  "plugins": [
+    {
+      "name": "workflow",
+      "displayName": "Momoi Labs: Workflow",
+      "source": "./",
+      "description": "Idea-to-ship workflow skills: repo setup, tickets, implementation, commits, and handoffs.",
+      "skills": [
+        "./skills/create-image",
+        "./skills/my-commit",
+        "./skills/my-handoff",
+        "./skills/my-implement",
+        "./skills/my-to-tickets",
+        "./skills/pg-researcher",
+        "./skills/pickup",
+        "./skills/setup-repo"
+      ],
+      "version": "0.1.0"
+    },
+    {
+      "name": "adhd-friendly",
+      "displayName": "Momoi Labs: ADHD Friendly",
+      "source": "./",
+      "description": "Self-contained HTML pages that put the answer first: session recaps and video study guides.",
+      "skills": [
+        "./skills/focus-buddy",
+        "./skills/video-study"
+      ],
+      "version": "0.1.0"
+    }
+  ]
+}
