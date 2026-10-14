@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+  :root {
+    --bg: #fbfaf7; --fg: #1d1d1f; --muted: #6b6b70; --line: #e4e1da;
+    --card: #ffffff; --accent: #2f6fdb; --good: #1f8a4c; --bad: #c2412d; --warn: #b7791f;
+    --hl: #fff4c2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16171a; --fg: #e8e6e1; --muted: #9a9890; --line: #2c2d31;
+      --card: #1e1f23; --accent: #7aa7ff; --good: #5cc98a; --bad: #ff8a73; --warn: #f0b54a;
+      --hl: #3a3420;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 18px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 1.7rem; line-height: 1.25; margin: 0 0 4px; }
+  h2 { font-size: 1.3rem; margin: 48px 0 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+  h3 { font-size: 1.05rem; margin: 24px 0 8px; }
+  p, li { margin: 0 0 10px; }
+  ul { padding-left: 22px; }
+  a { color: var(--accent); }
+  .meta { color: var(--muted); font-size: .9rem; margin-bottom: 24px; }
+  .box { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 16px 0; }
+  .tldr { border-left: 5px solid var(--accent); }
+  .tldr h2 { border: 0; margin: 0 0 10px; padding: 0; }
+  .ts { font-size: .8rem; font-variant-numeric: tabular-nums; text-decoration: none;
+        background: var(--line); color: var(--fg); padding: 1px 7px; border-radius: 6px; white-space: nowrap; }
+  .ts:hover { background: var(--accent); color: #fff; }
+  mark { background: var(--hl); color: inherit; padding: 0 3px; border-radius: 3px; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; margin: 12px 0; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .good { color: var(--good); font-weight: 600; }
+  .bad { color: var(--bad); font-weight: 600; }
+  .warn { color: var(--warn); font-weight: 600; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; margin: 10px 0; }
+  details[open] { padding-bottom: 14px; }
+  summary { cursor: pointer; font-weight: 600; }
+  dl { margin: 0; }
+  dt { font-weight: 700; margin-top: 14px; }
+  dd { margin: 2px 0 0; }
+  .steps { counter-reset: s; list-style: none; padding: 0; }
+  .steps li { counter-increment: s; position: relative; padding-left: 40px; margin-bottom: 14px; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 0;
+        width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff;
+        font-weight: 700; font-size: .9rem; display: grid; place-items: center; }
+  .note { font-size: .88rem; color: var(--muted); }
+  nav ol { columns: 2; font-size: .95rem; padding-left: 20px; }
+  @media (max-width: 560px) { nav ol { columns: 1; } }
+</style>
+</head>
+<body>
+<main>
+
+<h1>{{TITLE}}</h1>
+<div class="meta">
+  <!-- Video link, channel, duration, spoken language. Then reading time and how timestamp buttons work. -->
+  Video: <a href="{{URL}}">{{VIDEO_TITLE}}</a> · {{CHANNEL}} · {{DURATION}}<br>
+  {{READING_TIME_AND_TIMESTAMP_HINT}}
+</div>
+
+<!-- TL;DR: three to five bullets. The first answers the user's focus question. -->
+<div class="box tldr">
+  <h2>{{TLDR_HEADING}}</h2>
+  <ul>
+    <li><strong>{{ANSWER_TO_FOCUS}}</strong></li>
+  </ul>
+</div>
+
+<nav class="box">
+  <strong>{{SECTIONS_HEADING}}</strong>
+  <ol>
+    <li><a href="#focus">{{FOCUS_HEADING}}</a></li>
+    <li><a href="#concepts">{{CONCEPTS_HEADING}}</a></li>
+    <!-- One entry per remaining section. -->
+  </ol>
+</nav>
+
+<!-- Focus section: the part of the video the user cares about. Point to the
+     time range to watch, then a comparison table or a list of key ideas.
+     Every idea ends with a timestamp button. -->
+<h2 id="focus">1. {{FOCUS_HEADING}}</h2>
+<p>{{WATCH_ONLY_THIS_RANGE}}
+  <a class="ts" href="https://youtu.be/{{ID}}?t=630">10:30</a></p>
+
+<table>
+  <thead><tr><th>{{COL}}</th><th>{{COL}}</th><th>{{COL}}</th></tr></thead>
+  <tbody>
+    <!-- Verdict cells use class good, warn, or bad. -->
+    <tr><td><strong>{{ITEM}}</strong></td><td><span class="good">{{VERDICT}}</span></td><td>{{WHEN_TO_USE}}</td></tr>
+  </tbody>
+</table>
+
+<h3>{{KEY_IDEAS_HEADING}}</h3>
+<ul>
+  <li><strong>{{IDEA_AS_BOLD_SENTENCE}}</strong> {{ONE_LINE_OF_SUPPORT}}
+    <a class="ts" href="https://youtu.be/{{ID}}?t=735">12:15</a></li>
+</ul>
+
+<!-- Optional: when the video implies a workflow, turn it into numbered steps.
+     Say which parts are the speaker's and which are the order you chose. -->
+<ol class="steps">
+  <li><strong>{{STEP}}</strong> {{DETAIL}}</li>
+</ol>
+
+<!-- Concepts: one collapsed details block per term the video assumes the
+     viewer knows. Plain-language definition, then why it matters here. -->
+<h2 id="concepts">2. {{CONCEPTS_HEADING}}</h2>
+<details>
+  <summary>{{TERM}}</summary>
+  <p>{{DEFINITION_AND_WHY_IT_MATTERS}}</p>
+</details>
+
+<!-- Remaining sections, in video order. Keep each short. Use <mark> for
+     the single lesson of a section. Side topics and sponsor segments go
+     in collapsed details blocks, with the sponsor marked as skippable. -->
+
+<h2 id="verdict">{{N}}. {{VERDICT_HEADING}}</h2>
+<div class="box">
+  <p>{{SPEAKER_CONCLUSION}}</p>
+</div>
+
+<p class="note">{{SOURCE_NOTE: caption or local transcription, possible name misspellings, transcript path}}</p>
+
+</main>
+</body>
+</html>
