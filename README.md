@@ -124,6 +124,13 @@ Skills that run beneath the others, providing shared terminology.
 - **`/domain-modeling`** — sharpen the project's domain language (challenge fuzzy terms, resolve overloaded words, record ADRs)
 - **`/codebase-design`** — deep-module vocabulary (module, interface, depth, seam, adapter, leverage) for designing a module's shape
 
+## ADHD-Friendly Tools
+
+Self-contained HTML pages that put the answer first and keep the rest one click away.
+
+- **`/focus-buddy`**: summary of the session or work, with a living TODO list and source details on demand
+- **`/video-study`**: study guide from a video transcript, focused on what you want to learn, with a timestamp link on every idea
+
 ## Personal Wrappers
 
 These wrap Matt Pocock's original skills with personal conventions (path naming, branch prefixes, validation loops, git workflows).
@@ -135,7 +142,6 @@ These wrap Matt Pocock's original skills with personal conventions (path naming,
 | `my-implement`     | `implement`  | Native or T3 Code worktree, local validation loop, `my-commit`, PR publication                    |
 | `my-commit`        | (none)       | Personal commit gate — inspect, stage explicitly, validate                                     |
 | `pickup`          | (none)       | Receiving side of `my-handoff` — reconciles a handoff against repo state, builds the session task list |
-| `focus-buddy`      | (none)       | Focus Buddy: HTML summaries with current tasks, persistent checkboxes, and source details on demand |
 | `pg-researcher`    | (none)       | PostgreSQL source code and mailing list researcher                                             |
 | `setup-repo`        | (none)       | One-shot bootstrap: conventional-commits validation, `my-commit` as default commit, rebase-and-merge, `PRINCIPLES.md` + ADR scaffolding |
 
