@@ -59,15 +59,21 @@ npx skills@latest add momoi-labs/skills \
 Drop `--global` to install into the current project instead. Confirm what landed
 with `npx skills@latest list --global`.
 
-### Claude Code and Cursor plugins
+### Install one group
 
-The repository is also a plugin marketplace with two plugins. Install only the
+The skills come in two groups, also published as plugins. Install only the
 group you want:
 
 | Plugin          | Skills                                                                                                 |
 | --------------- | ------------------------------------------------------------------------------------------------------ |
 | `workflow`      | `create-image`, `my-commit`, `my-handoff`, `my-implement`, `my-to-tickets`, `pg-researcher`, `pickup`, `setup-repo` |
 | `adhd-friendly` | `focus-buddy`, `video-study`                                                                           |
+
+With the skills CLI, list the group's skills:
+
+```bash
+npx skills@latest add momoi-labs/skills --skill focus-buddy video-study
+```
 
 In Claude Code:
 
