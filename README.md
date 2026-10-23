@@ -66,7 +66,7 @@ group you want:
 
 | Plugin          | Skills                                                                                                 |
 | --------------- | ------------------------------------------------------------------------------------------------------ |
-| `workflow`      | `create-image`, `my-commit`, `my-handoff`, `my-implement`, `my-to-tickets`, `pg-researcher`, `pickup`, `setup-repo` |
+| `workflow`      | `codex-review`, `create-image`, `my-commit`, `my-handoff`, `my-implement`, `my-to-tickets`, `pg-researcher`, `pickup`, `setup-repo` |
 | `adhd-friendly` | `focus-buddy`, `video-study`                                                                           |
 
 With the skills CLI, list the group's skills:
@@ -151,6 +151,7 @@ These wrap Matt Pocock's original skills with personal conventions (path naming,
 | `my-handoff`       | `handoff`    | Dated docs, OS temp path, slug naming, paste-ready prompt                                      |
 | `my-to-tickets`    | `to-tickets` | GitHub native `--parent` / `--blocked-by`, reconciliation, shared handoff, unlock waves        |
 | `my-implement`     | `implement`  | Native or T3 Code worktree, local validation loop, `my-commit`, PR publication                    |
+| `codex-review`     | (none)       | Codex reviews the plan, each slice, and the branch until it approves, with a review log in the PR |
 | `my-commit`        | (none)       | Personal commit gate — inspect, stage explicitly, validate                                     |
 | `pickup`          | (none)       | Receiving side of `my-handoff` — reconciles a handoff against repo state, builds the session task list |
 | `pg-researcher`    | (none)       | PostgreSQL source code and mailing list researcher                                             |

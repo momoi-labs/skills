@@ -10,6 +10,7 @@
       "source": "./",
       "description": "Idea-to-ship workflow skills: repo setup, tickets, implementation, commits, and handoffs.",
       "skills": [
+        "./skills/codex-review",
         "./skills/create-image",
         "./skills/my-commit",
         "./skills/my-handoff",
