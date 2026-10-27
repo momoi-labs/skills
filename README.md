@@ -89,7 +89,7 @@ plugins there. The Cursor manifest has not been tested yet.
 
 ## Setup
 
-Run **`/setup-repo`** to bootstrap a repository. It orchestrates **`/setup-matt-pocock-skills`** (issue tracker, triage labels, domain docs), records **`my-commit`** as the default commit path, adds conventional-commits validation (PR title and commit messages), sets rebase-and-merge as the merge strategy, and scaffolds `docs/PRINCIPLES.md` + ADRs. Idempotent — safe to re-run.
+Run **`/setup-repo`** to bootstrap a repository. It orchestrates **`/setup-matt-pocock-skills`** (issue tracker, triage labels, domain docs), records **`my-commit`** as the default commit path, adds conventional-commits validation (PR title and commit messages), sets rebase-and-merge as the merge strategy, prepares Changesets releases when the repository has `.changeset/`, and scaffolds `docs/PRINCIPLES.md` + ADRs. Idempotent — safe to re-run.
 
 ## Main Flow: Idea → Ship
 
