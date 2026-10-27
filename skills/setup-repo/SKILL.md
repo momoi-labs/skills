@@ -22,6 +22,8 @@ convention. It works for a fresh repository and for adopting an existing one.
 - `.github/workflows/conventional-commits.yml` validating PR titles and commit
   messages with the `momoi-labs/actions/conventional-commits` action.
 - Merge strategy configured to rebase-and-merge (GitHub repositories only).
+- For a repository with Changesets: the `no-changeset` label and permission
+  for GitHub Actions to open pull requests (GitHub repositories only).
 - `docs/PRINCIPLES.md` (seeded with four starting principles) and `docs/adr/_template.md` (format).
 
 ## Process
@@ -36,6 +38,7 @@ Look at the current directory; don't assume. Check:
 - `AGENTS.md` / `CLAUDE.md` — which exists? Is there a `## Agent skills` block?
 - `.github/workflows/` — is there already a conventional-commits workflow?
 - `docs/PRINCIPLES.md`, `docs/adr/`, `CONTEXT.md`, `CONTEXT-MAP.md` — present?
+- `.changeset/` — does the repository release with Changesets?
 
 ### 2. Create the repository if the user asks
 
@@ -117,7 +120,25 @@ gh repo edit --enable-rebase-merge=true --enable-merge-commit=false --enable-squ
 
 If there is no GitHub remote, skip this step.
 
-### 7. Engineering principles and ADR scaffolding
+### 7. Releases with Changesets
+
+Run this step only when the repository has `.changeset/` and a GitHub remote.
+The Changeset check skips a pull request that has the `no-changeset` label,
+and the Version workflow opens its pull request with `GITHUB_TOKEN`. Both
+commands are idempotent:
+
+```bash
+gh label create no-changeset --force --description "No user-visible change"
+gh api -X PUT repos/{owner}/{repo}/actions/permissions/workflow \
+  -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true
+```
+
+If the second command fails because the organization blocks the setting, say
+so and tell the user to allow GitHub Actions to create pull requests in the
+organization settings. Without it the Version workflow cannot open its pull
+request.
+
+### 8. Engineering principles and ADR scaffolding
 
 Create these only if they are absent; never overwrite existing content:
 
@@ -137,13 +158,14 @@ If `docs/PRINCIPLES.md` already exists with real content, leave it untouched.
 Optional: if the user wants, help adapt or add principles now using
 `/grill-with-docs`. Do not write invented principles without the user.
 
-### 8. Idempotency contract
+### 9. Idempotency contract
 
 | Files this skill owns | Rule |
 | --------------------- | ---- |
 | `.github/workflows/conventional-commits.yml` | update in place; never duplicate |
 | `## Agent skills` block (incl. `### Commit convention`) | update in place; never duplicate |
 | `docs/adr/_template.md` | update in place |
+| `no-changeset` label and Actions workflow permissions | set in place; never duplicate |
 
 | Files the user owns | Rule |
 | ------------------- | ---- |
