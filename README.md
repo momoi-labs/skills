@@ -140,7 +140,7 @@ Skills that run beneath the others, providing shared terminology.
 Self-contained HTML pages that put the answer first and keep the rest one click away.
 
 - **`/focus-buddy`**: summary of the session or work, with a living TODO list and source details on demand
-- **`/video-study`**: study guide from a video transcript, focused on what you want to learn, with a timestamp link on every idea
+- **`/video-study`**: study guide from a video transcript, focused on what you want to learn, with slide screenshots, a timestamp link on every idea, and a links list
 
 ## Personal Wrappers
 

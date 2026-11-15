@@ -57,6 +57,10 @@
   .note { font-size: .88rem; color: var(--muted); }
   nav ol { columns: 2; font-size: .95rem; padding-left: 20px; }
   @media (max-width: 560px) { nav ol { columns: 1; } }
+  figure { margin: 14px 0 18px; }
+  figure img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  figcaption { font-size: .85rem; color: var(--muted); margin-top: 6px; }
+  .links li { margin-bottom: 6px; }
 </style>
 </head>
 <body>
@@ -113,6 +117,18 @@
   <li><strong>{{STEP}}</strong> {{DETAIL}}</li>
 </ol>
 
+<!-- Screenshots: one figure per idea that has a slide or screen. The src is
+     a placeholder, IMG:<name> in double curly braces, that scripts/embed.py
+     replaces with a base64 data URI. The name is the second zero-padded to 4
+     digits: img/0140.jpg is IMG:0140 in double braces. The caption says what the frame shows and ends with a
+     timestamp button. When the slide contradicts or complicates the speaker,
+     add a note paragraph after the figure and mark it as the reader's note. -->
+<figure>
+  <img src="{{IMG:0125}}" alt="{{WHAT_THE_FRAME_SHOWS}}">
+  <figcaption>{{CAPTION}} <a class="ts" href="https://youtu.be/{{ID}}?t=125">2:05</a></figcaption>
+</figure>
+<p class="note">{{READER_NOTE: optional, marked as yours, not the speaker's}}</p>
+
 <!-- Concepts: one collapsed details block per term the video assumes the
      viewer knows. Plain-language definition, then why it matters here. -->
 <h2 id="concepts">2. {{CONCEPTS_HEADING}}</h2>
@@ -129,6 +145,17 @@
 <div class="box">
   <p>{{SPEAKER_CONCLUSION}}</p>
 </div>
+
+<!-- Links: last list before the source note. Say which links come from the
+     video description and which you added from knowledge, and tell the reader
+     to verify the added ones. Never invent a URL. A URL from a slide counts
+     only when you read it on the slide. -->
+<h2 id="links">{{N}}. {{LINKS_HEADING}}</h2>
+<p class="note">{{WHICH_LINKS_COME_FROM_THE_DESCRIPTION_AND_WHICH_YOU_ADDED_VERIFY_THEM}}</p>
+<ul class="links">
+  <li><a href="{{URL}}">{{VIDEO_TITLE}}</a> ({{CHANNEL}})</li>
+  <li><a href="{{URL}}">{{NAME}}</a>: {{WHAT_IT_IS}} ({{FROM_DESCRIPTION_OR_ADDED_BY_ME}})</li>
+</ul>
 
 <p class="note">{{SOURCE_NOTE: caption or local transcription, possible name misspellings, transcript path}}</p>
 
