@@ -31,7 +31,7 @@ anything from `dl/`.
 3. Download the video, captions, and description into `dl/`:
    `yt-dlp -q --write-subs --write-auto-subs --sub-langs <lang> --sub-format json3 --write-description -f "bv*[height<=1080]+ba/b" -o "dl/video.%(ext)s" <url>`.
 4. Build the transcript with the bundled script:
-   `python -I <skill-dir>/scripts/transcript.py dl/video.<lang>.json3 transcript.txt`.
+   `python3 -I <skill-dir>/scripts/transcript.py dl/video.<lang>.json3 transcript.txt`.
    Each line holds 30 seconds of speech and starts with its timestamp.
 5. No captions at all: download the audio and transcribe it with a local
    tool such as `whisper-cli` or `faster-whisper`. If none is installed, stop
@@ -49,11 +49,42 @@ Read all of it before writing. Note, with timestamps:
 - sponsor segments and side topics;
 - the speaker's final verdict.
 
-## 4. Write the page
+## 4. Take screenshots
 
-Write `video-<id>/summary.html` from
+The video is in `dl/` from step 2. Work in `video-<id>/`. Never run anything
+from `dl/`. Run the scripts with `python3 -I`.
+
+1. Sample candidate frames and contact sheets:
+   `python3 -I <skill-dir>/scripts/frames.py candidates dl/video.<ext> . --step 20`.
+   Use a smaller step for fast-moving screen recordings. The script never
+   samples past the video duration (frames there can be solid green). It
+   writes `sheets/sheetNN.jpg` (9 frames each, 3 columns) and prints the
+   seconds on each sheet, left to right, top to bottom.
+2. Look at every sheet with the image viewer. Pick the frames where a slide or
+   screen changes and matches a topic in the transcript. Do not guess from
+   timestamps alone.
+3. Conference videos often have a speaker camera and logos around the slide.
+   Extract one full frame, look at it, and find the slide rectangle. Crop to
+   it, a few pixels inside the edge, to drop border lines. For plain screen
+   recordings, do not crop.
+4. Save the final frames, named by their second:
+   `python3 -I <skill-dir>/scripts/frames.py final dl/video.<ext> . 140 160 --crop W:H:X:Y`.
+   They land in `img/<name>.jpg`, about 1000 px wide, JPEG quality 4. The name
+   is the second zero-padded to 4 digits: `140` becomes `img/0140.jpg`.
+5. Open a few final frames and check that each shows what you will caption.
+
+Done when each chosen frame is a real slide or screen that matches a topic.
+
+## 5. Write the page
+
+Write `video-<id>/summary.src.html` from
 [references/template.html](references/template.html). Keep its CSS; replace
-the placeholders and follow the comments in the template. Use this order:
+the placeholders and follow the comments in the template. Embed each
+screenshot with `{{IMG:<name>}}` in the `src` of its `<img>`. The name is the
+second zero-padded to 4 digits, so `img/0140.jpg` is `{{IMG:0140}}`. Then build the
+self-contained page:
+`python3 -I <skill-dir>/scripts/embed.py .` writes `summary.html` and fails
+on a missing image or a leftover `{{` placeholder. Use this order:
 
 1. **TL;DR** of three to five bullets. The first one answers the focus.
 2. **Focus section** with the time range worth watching, a comparison table
@@ -64,7 +95,12 @@ the placeholders and follow the comments in the template. Use this order:
 5. **Remaining topics** in video order. Side topics and the sponsor go in
    collapsed blocks, and the sponsor is marked as skippable.
 6. **Verdict** of the speaker.
-7. **Source note**: where the transcript came from, a warning that automatic
+7. **Links**: a final list with the video, the speaker profiles and repos from
+   the video description (`dl/video.description`), and the tools or projects
+   the video names. Mark which links come from the description and which you
+   added from knowledge, and tell the reader to verify the added ones. Do not
+   invent URLs. Verify a URL from a slide by looking at the slide.
+8. **Source note**: where the transcript came from, a warning that automatic
    captions can misspell names, and the transcript path.
 
 Writing rules:
@@ -79,15 +115,21 @@ Writing rules:
   additions as yours.
 - **Flag doubtful names.** When a caption looks like a misheard product or
   site name, say so next to it instead of guessing.
+- **Every figure gets a caption and a timestamp button.** Put figures next to
+  the idea they show.
+- **Mark your own notes.** When a slide contradicts or complicates what the
+  speaker says (a number that differs, a metric that got worse), say so next
+  to the figure and label it as the reader's note, not the speaker's claim.
 - **One idea per bullet, short sentences.** Color carries meaning only:
   `good`, `warn`, and `bad` mark verdicts, and `<mark>` marks the single
   lesson of a section.
 
-Done when every claim about the focus appears in the page with its timestamp
-and the TL;DR alone answers the user's question.
+Done when every claim about the focus appears in the page with its timestamp,
+the TL;DR alone answers the user's question, `summary.html` has no `{{`
+left, and the images are embedded.
 
-## 5. Deliver
+## 6. Deliver
 
 Open the file with `xdg-open` on Linux or `open` on macOS. Reply with the
 absolute path, the answer to the focus in three to six lines, and any doubtful
-names. Mention that the video and transcript sit in the same directory.
+names. Mention that the video, transcript, and frames sit in the same directory.
